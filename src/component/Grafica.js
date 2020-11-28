@@ -14,58 +14,125 @@ export default function Grafica() {
   ];
 
   useEffect(() => {
-   
-    const svg = d3.select("#canvas").append("svg")
-    .attr("width", 600)
-    .attr("height", 500)
-    .style("border-color", "black")
-    .style("border-style", "solid")
-    .style("border-width", "1px");
+    const margin = { top: 30, right: 30, bottom: 70, left: 60 };
+    const width = 460 - margin.left - margin.right;
+    const height = 400 - margin.top - margin.bottom;
 
-const rectangle = svg.append("rect")
-    .attr("x", 50)
-    .attr("y", 50)
-    .attr("width", 50)
-    .attr("height", 50);
+    const svg = d3
+      .select("#canvas")
+      .append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-d3.select("#start").on("click", function () {
-    rectangle
-        .transition()
-        .attr("x", 250)
-        .attr("width", 100) 
-      .attr("height", 100) 
-      .on("end",function() { 
-		    d3.select(this)
-		    	.transition() 
-                .attr("fill", "blue") 
-                 
-		});
-    
-});
+    // Initialize the X axis
+    var x = d3.scaleBand().range([0, width]).padding(0.2);
+    var xAxis = svg
+      .append("g")
+      .attr("transform", "translate(0," + height + ")");
 
-d3.select("#reset").on("click", function () {
-    rectangle
-        .transition()
-        .attr("x", 50)
-        .on("end",function() { 
-          d3.select(this)
-            .transition() 
-                  .attr("fill", "#000") 
-                   
-      });
-        
-});
+    // Initialize the Y axis
+    var y = d3.scaleLinear().range([height, 0]);
+    var yAxis = svg.append("g").attr("class", "myYaxis");
 
-    
+    d3.select("#start").on("click", function () {
+      x.domain(
+        data.map(function (d) {
+          return d.name;
+        })
+      );
+      xAxis.call(d3.axisBottom(x));
+
+      // Update the Y axis
+      y.domain([
+        0,
+        d3.max(data, function (d) {
+          return d.index2005;
+        }),
+      ]);
+      yAxis.transition().duration(1000).call(d3.axisLeft(y));
+
+      // Create the u variable
+      var u = svg.selectAll("rect").data(data);
+
+      u.enter()
+        .append("rect") // Add a new rect for each new elements
+        .merge(u) // get the already existing elements as well
+        .transition() // and apply changes to all of them
+        .duration(1000)
+        .attr("x", function (d) {
+          return x(d.name);
+        })
+        .attr("y", function (d) {
+          return y(d.index2005);
+        })
+        .attr("width", x.bandwidth())
+        .attr("height", function (d) {
+          return height - y(d.value);
+        })
+        .attr("fill", "#69b3a2")
+
+      // If less group in the new dataset, I delete the ones not in use anymore
+      u.exit().remove();
+    });
+
+    d3.select("#reset").on("click", function () {
+      x.domain(
+        data.map(function (d) {
+          return d.name;
+        })
+      );
+      xAxis.call(d3.axisBottom(x));
+
+      // Update the Y axis
+      y.domain([
+        0,
+        d3.max(data, function (d) {
+          return d.index2006;
+        }),
+      ]);
+      yAxis.transition().duration(1000).call(d3.axisLeft(y));
+
+      // Create the u variable
+      var u = svg.selectAll("rect").data(data);
+
+      u.enter()
+        .append("rect") // Add a new rect for each new elements
+        .merge(u) // get the already existing elements as well
+        .transition() // and apply changes to all of them
+        .duration(1000)
+        .attr("x", function (d) {
+          return x(d.name);
+        })
+        .attr("y", function (d) {
+          return y(d.index2006);
+        })
+        .attr("width", x.bandwidth())
+        .attr("height", function (d) {
+          return height - y(d.index2006);
+        })
+        .on("end", function () {
+          d3.select(this).transition().attr("fill", "blue");
+        });
+
+      // If less group in the new dataset, I delete the ones not in use anymore
+      u.exit().remove();
+    });
   }, []);
 
   return (
     <div class="container">
       <h1>Reto 1</h1>
       <div>
-     <button className="btn-grap" id="reset"> Gráfica del 2005</button>
-     <button className="btn-grap" id="start">Gráfica del 2006 </button>
-     </div>
+        <button className="btn-grap" id="reset">
+          {" "}
+          Gráfica del 2005
+        </button>
+        <button className="btn-grap" id="start">
+          Gráfica del 2006{" "}
+        </button>
+      </div>
       <div id="canvas"></div>
     </div>
   );
