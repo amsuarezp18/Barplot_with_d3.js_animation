@@ -69,7 +69,7 @@ export default function Grafica() {
         })
         .attr("width", x.bandwidth())
         .attr("height", function (d) {
-          return height - y(d.value);
+          return height - y(d.index2005);
         })
         .attr("fill", "#69b3a2")
 
@@ -125,12 +125,13 @@ export default function Grafica() {
     <div class="container">
       <h1>Reto 1</h1>
       <div>
+        
+        <button className="btn-grap" id="start">
+          Gráfica del 2005{" "}
+        </button>
         <button className="btn-grap" id="reset">
           {" "}
-          Gráfica del 2005
-        </button>
-        <button className="btn-grap" id="start">
-          Gráfica del 2006{" "}
+          Gráfica del 2006
         </button>
       </div>
       <div id="canvas"></div>
